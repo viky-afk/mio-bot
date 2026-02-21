@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,68 +8,51 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Adattiamo i colori al tema dell'utente (chiaro/scuro) */
-        body {
-            background-color: var(--tg-theme-bg-color, #f5f5f5);
-            color: var(--tg-theme-text-color, #222);
-        }
-        .card {
-            background-color: var(--tg-theme-secondary-bg-color, #fff);
-        }
+        body { background-color: var(--tg-theme-bg-color, #f3f4f6); color: var(--tg-theme-text-color, #111827); }
+        .tg-card { background-color: var(--tg-theme-secondary-bg-color, #ffffff); }
+        .tg-button { background-color: var(--tg-theme-button-color, #3b82f6); color: var(--tg-theme-button-text-color, #ffffff); }
     </style>
 </head>
-<body class="p-6 flex flex-col items-center justify-center min-h-screen">
+<body class="antialiased min-h-screen flex items-center justify-center p-4">
 
-    <div class="card w-full max-w-md rounded-3xl p-8 shadow-2xl text-center border border-gray-100">
-        <!-- Foto Profilo -->
-        <div class="w-24 h-24 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-inner">
-            <span id="initials">?</span>
+    <div class="tg-card w-full max-w-md rounded-3xl shadow-xl p-8 text-center border border-gray-100">
+        <!-- Foto Profilo con Iniziale -->
+        <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+            <span id="user-initial">?</span>
         </div>
         
-        <h1 id="user-name" class="text-2xl font-extrabold mb-1">Utente</h1>
-        <p class="text-blue-500 font-medium mb-6">Developer & Creative</p>
+        <h1 id="user-name" class="text-2xl font-bold mb-1">Caricamento...</h1>
+        <p class="text-blue-500 font-medium mb-6">Mio Biglietto Digitale</p>
 
-        <div class="grid grid-cols-1 gap-4 w-full">
-            <button onclick="sendContact()" class="w-full py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition transform active:scale-95 shadow-lg">
-                📲 Condividi Contatto
+        <div class="space-y-4">
+            <!-- Sostituisci l'email con la tua vera email -->
+            <button onclick="window.location.href='mailto:tua.email@esempio.com'" class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 font-semibold flex justify-between items-center hover:bg-gray-100 transition">
+                <span>📧 Email</span>
+                <span class="text-sm text-gray-400">Scrivimi</span>
             </button>
             
-            <a href="https://maps.app.goo.gl/esempio" target="_blank" class="w-full py-4 rounded-2xl bg-white border-2 border-gray-200 font-bold hover:border-blue-500 transition text-center">
-                📍 Dove Sono
-            </a>
+            <!-- Sostituisci il link con quello della tua posizione -->
+            <button onclick="tg.openLink('https://maps.app.goo.gl/esempio')" class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 font-semibold flex justify-between items-center hover:bg-gray-100 transition">
+                <span>📍 Dove Sono</span>
+                <span class="text-sm text-blue-400">Google Maps</span>
+            </button>
         </div>
 
-        <button onclick="tg.close()" class="mt-8 text-sm text-gray-400 font-medium hover:text-gray-600">
-            Chiudi Schermata
+        <button onclick="tg.close()" class="tg-button mt-10 w-full py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">
+            Chiudi App
         </button>
     </div>
 
     <script>
-        // Inizializziamo la WebApp
         const tg = window.Telegram.WebApp;
         tg.expand(); // Espande l'app a tutto schermo
 
-        // Recuperiamo i dati dell'utente da Telegram
+        // Prende i dati dell'utente direttamente da Telegram
         const user = tg.initDataUnsafe?.user;
         if (user) {
             document.getElementById('user-name').innerText = user.first_name + " " + (user.last_name || "");
-            document.getElementById('initials').innerText = user.first_name.charAt(0).toUpperCase();
+            document.getElementById('user-initial').innerText = user.first_name.charAt(0).toUpperCase();
         }
-
-        function sendContact() {
-            // Possiamo inviare dati dalla WebApp indietro al Bot
-            const data = { action: 'share_contact', user: user?.first_name };
-            tg.sendData(JSON.stringify(data)); 
-            // Nota: sendData funziona solo se l'app è aperta tramite un bottone della tastiera
-            tg.close();
-        }
-
-        // Impostiamo il colore del bottone principale di sistema (quello in basso di Telegram)
-        tg.MainButton.setText("CONTATTAMI ORA");
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => {
-            tg.openTelegramLink('https://t.me/tuo_username');
-        });
 
         tg.ready();
     </script>
