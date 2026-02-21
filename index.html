@@ -8,7 +8,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Definizione di colori universali fissi - Tema Sky Blue */
         :root {
             --bg-universal: #f0f7ff;
             --card-white: #ffffff;
@@ -20,7 +19,7 @@
         body {
             background-color: var(--bg-universal);
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
             display: flex;
             justify-content: center;
@@ -30,7 +29,7 @@
 
         .main-card {
             background-color: var(--card-white);
-            width: 92%;
+            width: 90%;
             max-width: 360px;
             border-radius: 30px;
             padding: 40px 24px;
@@ -50,25 +49,26 @@
             color: white;
             font-size: 32px;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.2);
         }
 
-        .action-button {
+        /* Trasformiamo il bottone in un link reale per massima compatibilità */
+        .action-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
             width: 100%;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 18px;
             padding: 16px;
             margin-bottom: 14px;
-            display: flex;
             align-items: center;
             justify-content: space-between;
             transition: all 0.2s ease;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
         }
 
-        .action-button:active {
+        .action-link:active {
             transform: scale(0.97);
             background-color: #f1f5f9;
         }
@@ -83,76 +83,60 @@
             width: 100%;
             font-weight: bold;
             font-size: 16px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
     <div class="main-card">
-        <!-- Profilo Utente -->
+        <!-- Profilo -->
         <div class="avatar-circle" id="user-initial">?</div>
         <h1 id="user-name" style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">Caricamento...</h1>
         <p style="color: var(--accent-blue); font-weight: 600; margin-bottom: 32px;">Sviluppatore & Creativo</p>
 
-        <!-- Pulsanti di Azione -->
+        <!-- Pulsanti -->
         <div class="buttons-container">
-            <!-- Pulsante Email -->
-            <div class="action-button" onclick="sendMail()">
+            <!-- LINK EMAIL DIRETTO -->
+            <a id="email-link" href="#" class="action-link">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 22px;">📧</span>
                     <span style="font-weight: 700;">Email</span>
                 </div>
-                <span style="color: var(--text-muted); font-size: 13px;">Invia messaggio</span>
-            </div>
+                <span style="color: var(--text-muted); font-size: 13px;">Scrivimi ora</span>
+            </a>
 
-            <!-- Pulsante Posizione -->
-            <div class="action-button" onclick="openMaps()">
+            <!-- LINK MAPPA -->
+            <div class="action-link" onclick="tg.openLink('https://maps.app.goo.gl/esempio')">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 22px;">📍</span>
                     <span style="font-weight: 700;">Posizione</span>
                 </div>
-                <span style="color: var(--accent-blue); font-size: 13px; font-weight: bold;">Apri Maps</span>
+                <span style="color: var(--accent-blue); font-size: 13px; font-weight: bold;">Maps</span>
             </div>
         </div>
 
-        <!-- Chiusura App -->
         <button class="close-btn" onclick="tg.close()">Chiudi Biglietto</button>
     </div>
 
     <script>
-        // Inizializzazione Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- CONFIGURAZIONE DATI ---
-        const MY_EMAIL = "vincenzocoluccio05@gmail.com"; // Inserisci qui la tua email
-        const SUBJECT = "Contatto da Biglietto Digitale"; // Oggetto predefinito dell'email
-        const MY_MAPS = "https://maps.app.goo.gl/esempio"; // Inserisci il link Google Maps
+        // --- CONFIGURAZIONE ---
+        const MY_EMAIL = "tua.email@esempio.com"; // CAMBIA QUESTA
+        const SUBJECT = "Contatto da Bot Telegram";
 
-        // Caricamento dati utente Telegram
+        // Prepariamo il link dell'email appena la pagina carica
+        const emailLink = document.getElementById('email-link');
+        emailLink.href = `mailto:${MY_EMAIL}?subject=${encodeURIComponent(SUBJECT)}`;
+
+        // Dati Utente
         const user = tg.initDataUnsafe?.user;
         if (user) {
             document.getElementById('user-name').innerText = user.first_name + (user.last_name ? " " + user.last_name : "");
             document.getElementById('user-initial').innerText = user.first_name.charAt(0).toUpperCase();
         }
 
-        // Funzione per l'invio dell'email
-        function sendMail() {
-            // Crea il link mailto con oggetto precompilato
-            // encodeURIComponent serve a gestire correttamente gli spazi e i caratteri speciali
-            const mailtoLink = `mailto:${MY_EMAIL}?subject=${encodeURIComponent(SUBJECT)}`;
-            
-            // Usiamo il metodo nativo di Telegram per aprire i link esterni
-            tg.openLink(mailtoLink);
-        }
-
-        // Funzione per aprire la mappa
-        function openMaps() {
-            tg.openLink(MY_MAPS);
-        }
-
-        // Segnala a Telegram che la WebApp è pronta
         tg.ready();
     </script>
 </body>
