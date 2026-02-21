@@ -3,190 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biglietto Digitale Smart</title>
-    <!-- Script ufficiale di Telegram per le Web App -->
+    <title>Digital Business Card</title>
+    <!-- Script ufficiale di Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Adattamento automatico ai colori del tema di Telegram (Light/Dark) */
+        /* Definizione di colori universali fissi */
+        :root {
+            --bg-universal: #f0f7ff; /* Celeste chiarissimo */
+            --card-white: #ffffff;
+            --accent-blue: #0088cc; /* Blu classico Telegram */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
         body {
-            background-color: var(--tg-theme-bg-color, #f3f4f6);
-            color: var(--tg-theme-text-color, #111827);
-            font-family: sans-serif;
+            background-color: var(--bg-universal);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .card {
-            background-color: var(--tg-theme-secondary-bg-color, #ffffff);
+
+        .main-card {
+            background-color: var(--card-white);
+            width: 90%;
+            max-width: 360px;
+            border-radius: 28px;
+            padding: 32px 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 136, 204, 0.1), 0 8px 10px -6px rgba(0, 136, 204, 0.1);
+            text-align: center;
         }
-        .btn-main {
-            background-color: var(--tg-theme-button-color, #3b82f6);
-            color: var(--tg-theme-button-text-color, #ffffff);
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0088cc, #00c6ff);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
         }
-        .ai-section {
-            background-color: rgba(59, 130, 246, 0.05);
-            border: 1px dashed #3b82f6;
+
+        .action-button {
+            width: 100%;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
-        /* Spinner di caricamento */
-        .loader {
-            border-top-color: #3b82f6;
-            animation: spinner 1.5s linear infinite;
+
+        .action-button:active {
+            transform: scale(0.98);
+            background-color: #f1f5f9;
         }
-        @keyframes spinner {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .close-btn {
+            margin-top: 24px;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 14px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 136, 204, 0.2);
         }
     </style>
 </head>
-<body class="min-h-screen py-8 px-4 flex flex-col items-center">
+<body>
 
-    <div class="card w-full max-w-md rounded-3xl shadow-2xl p-6 text-center border border-gray-100 mb-6">
-        <!-- Avatar con Iniziale -->
-        <div class="w-20 h-20 bg-gradient-to-tr from-blue-600 to-indigo-700 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-            <span id="user-initial">?</span>
-        </div>
-        
-        <h1 id="user-name" class="text-2xl font-bold mb-1">Caricamento...</h1>
-        <p class="text-blue-500 font-medium mb-8">Sviluppatore & Creativo</p>
+    <div class="main-card">
+        <!-- Parte superiore: Profilo -->
+        <div class="avatar-circle" id="user-initial">?</div>
+        <h1 id="user-name" style="font-size: 24px; font-weight: 800; margin: 0 0 4px 0;">Caricamento...</h1>
+        <p style="color: var(--accent-blue); font-weight: 600; margin-bottom: 32px;">Sviluppatore & Creativo</p>
 
-        <div class="space-y-3">
-            <button onclick="window.location.href='mailto:tua.email@esempio.com'" class="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition">
-                <span class="font-bold">📧 Email</span>
-                <span class="text-xs text-gray-400">Scrivimi</span>
-            </button>
-
-            <button onclick="tg.openLink('https://maps.app.goo.gl/esempio')" class="w-full flex items-center justify-between p-4 rounded-2xl bg-gray-50 border border-gray-200 hover:bg-gray-100 transition">
-                <span class="font-bold">📍 Dove Sono</span>
-                <span class="text-xs text-blue-500">Apri Maps</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- SEZIONE GEMINI AI -->
-    <div class="card ai-section w-full max-w-md rounded-3xl p-6 shadow-lg">
-        <h2 class="text-lg font-bold mb-4 flex items-center justify-center gap-2">
-            Assistente AI ✨
-        </h2>
-        
-        <p class="text-xs text-gray-500 mb-4 text-center">Usa l'intelligenza artificiale per interagire con me</p>
-
-        <div class="space-y-4">
-            <div>
-                <label class="block text-left text-sm font-semibold mb-1 ml-1">Di cosa hai bisogno?</label>
-                <textarea id="ai-input" rows="2" class="w-full p-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Es: Aiutami a scriverti un messaggio di collaborazione..."></textarea>
-            </div>
-
-            <div class="flex gap-2">
-                <button onclick="askGemini('bio')" class="flex-1 py-2 px-3 rounded-xl bg-blue-50 text-blue-600 text-xs font-bold border border-blue-200 hover:bg-blue-100">
-                    ✨ Crea Bio
-                </button>
-                <button onclick="askGemini('message')" class="flex-1 py-2 px-3 rounded-xl bg-indigo-50 text-indigo-600 text-xs font-bold border border-indigo-200 hover:bg-indigo-100">
-                    ✨ Scrivi Messaggio
-                </button>
-            </div>
-
-            <!-- Area Risultato AI -->
-            <div id="ai-result-container" class="hidden mt-4 p-4 rounded-xl bg-white border border-gray-100 text-left relative">
-                <div id="ai-loader" class="hidden absolute inset-0 bg-white/80 flex items-center justify-center rounded-xl z-10">
-                    <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8"></div>
+        <!-- Sezione Contatti -->
+        <div class="buttons-container">
+            <div class="action-button" onclick="sendMail()">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">📧</span>
+                    <span style="font-weight: 600;">Email</span>
                 </div>
-                <p id="ai-result-text" class="text-sm italic text-gray-700 whitespace-pre-wrap"></p>
-                <button onclick="copyAiResult()" id="copy-btn" class="mt-2 text-[10px] text-blue-500 font-bold uppercase tracking-wider hidden">Copia Testo</button>
+                <span style="color: var(--text-muted); font-size: 13px;">Scrivimi ora</span>
+            </div>
+
+            <div class="action-button" onclick="openMaps()">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 20px;">📍</span>
+                    <span style="font-weight: 600;">Posizione</span>
+                </div>
+                <span style="color: var(--accent-blue); font-size: 13px; font-weight: bold;">Google Maps</span>
             </div>
         </div>
-    </div>
 
-    <button onclick="tg.close()" class="btn-main mt-8 w-full max-w-md py-4 rounded-2xl font-bold text-lg shadow-md active:scale-95 transition-transform">
-        Chiudi Schermata
-    </button>
+        <!-- Pulsante di Chiusura -->
+        <button class="close-btn" onclick="tg.close()">Chiudi Biglietto</button>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
+        // Dati personali (MODIFICA QUI)
+        const MY_EMAIL = "tua.email@esempio.com";
+        const MY_MAPS = "https://maps.app.goo.gl/esempio";
+
+        // Recupero info utente Telegram
         const user = tg.initDataUnsafe?.user;
         if (user) {
-            document.getElementById('user-name').innerText = user.first_name + " " + (user.last_name || "");
+            document.getElementById('user-name').innerText = user.first_name + (user.last_name ? " " + user.last_name : "");
             document.getElementById('user-initial').innerText = user.first_name.charAt(0).toUpperCase();
         }
 
-        // --- INTEGRAZIONE GEMINI API ---
-        const apiKey = ""; // Inserito automaticamente dall'ambiente
-        
-        async function fetchGemini(prompt, retries = 5, delay = 1000) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { 
-                    parts: [{ text: "Sei un assistente per un biglietto da visita digitale. Rispondi in modo professionale, cordiale e conciso in lingua italiana." }] 
-                }
-            };
-
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!response.ok) throw new Error('Errore API');
-                    const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text;
-                } catch (error) {
-                    if (i === retries - 1) throw error;
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2; // Backoff esponenziale
-                }
-            }
+        function sendMail() {
+            tg.openLink(`mailto:${MY_EMAIL}`);
         }
 
-        async function askGemini(type) {
-            const input = document.getElementById('ai-input').value.trim();
-            if (!input) {
-                tg.showAlert("Per favore, scrivi qualcosa nel campo di testo!");
-                return;
-            }
-
-            const resultContainer = document.getElementById('ai-result-container');
-            const resultText = document.getElementById('ai-result-text');
-            const loader = document.getElementById('ai-loader');
-            const copyBtn = document.getElementById('copy-btn');
-
-            resultContainer.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            resultText.innerText = "L'AI sta scrivendo...";
-            copyBtn.classList.add('hidden');
-
-            let prompt = "";
-            if (type === 'bio') {
-                prompt = `Genera una bio professionale breve (max 150 caratteri) basata su questo input: ${input}`;
-            } else {
-                prompt = `Scrivi un breve messaggio di networking o di proposta lavorativa da inviare a un professionista, basandoti su questa idea: ${input}`;
-            }
-
-            try {
-                const result = await fetchGemini(prompt);
-                resultText.innerText = result;
-                copyBtn.classList.remove('hidden');
-            } catch (error) {
-                resultText.innerText = "Ops! Si è verificato un errore durante la generazione. Riprova tra poco.";
-            } finally {
-                loader.classList.add('hidden');
-            }
+        function openMaps() {
+            tg.openLink(MY_MAPS);
         }
 
-        function copyAiResult() {
-            const text = document.getElementById('ai-result-text').innerText;
-            const tempInput = document.createElement("textarea");
-            tempInput.value = text;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-            
-            // Feedback visivo tramite Telegram
-            tg.showScanQrPopup({ text: "Testo copiato!" });
-            setTimeout(() => tg.closeScanQrPopup(), 1000);
-        }
-
+        // Segnala che l'app è pronta
         tg.ready();
     </script>
 </body>
