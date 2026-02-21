@@ -25,6 +25,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow: hidden;
         }
 
         .main-card {
@@ -51,24 +52,22 @@
             font-weight: bold;
         }
 
-        /* Trasformiamo il bottone in un link reale per massima compatibilità */
-        .action-link {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
+        .action-btn {
             width: 100%;
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 18px;
             padding: 16px;
             margin-bottom: 14px;
+            display: flex;
             align-items: center;
             justify-content: space-between;
             transition: all 0.2s ease;
-            box-sizing: border-box;
+            cursor: pointer;
+            text-align: left;
         }
 
-        .action-link:active {
+        .action-btn:active {
             transform: scale(0.97);
             background-color: #f1f5f9;
         }
@@ -84,51 +83,83 @@
             font-weight: bold;
             font-size: 16px;
         }
+
+        /* Notifica di copia */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="main-card">
-        <!-- Profilo -->
         <div class="avatar-circle" id="user-initial">?</div>
         <h1 id="user-name" style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">Caricamento...</h1>
-        <p style="color: var(--accent-blue); font-weight: 600; margin-bottom: 32px;">Sviluppatore & Creativo</p>
+        <p style="color: var(--accent-blue); font-weight: 600; margin-bottom: 32px;">Contatti Professionali</p>
 
-        <!-- Pulsanti -->
         <div class="buttons-container">
-            <!-- LINK EMAIL DIRETTO -->
-            <a id="email-link" href="#" class="action-link">
+            <!-- BOTTONE EMAIL -->
+            <div class="action-btn" onclick="handleEmail()">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 22px;">📧</span>
                     <span style="font-weight: 700;">Email</span>
                 </div>
-                <span style="color: var(--text-muted); font-size: 13px;">Scrivimi ora</span>
-            </a>
+                <span style="color: var(--accent-blue); font-size: 11px; font-weight: bold; text-transform: uppercase;">Apri o Copia</span>
+            </div>
 
-            <!-- LINK MAPPA -->
-            <div class="action-link" onclick="tg.openLink('https://maps.app.goo.gl/esempio')">
+            <!-- BOTTONE POSIZIONE -->
+            <div class="action-btn" onclick="tg.openLink('https://maps.app.goo.gl/esempio')">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 22px;">📍</span>
                     <span style="font-weight: 700;">Posizione</span>
                 </div>
-                <span style="color: var(--accent-blue); font-size: 13px; font-weight: bold;">Maps</span>
+                <span style="color: var(--text-muted); font-size: 11px;">Google Maps</span>
             </div>
         </div>
 
-        <button class="close-btn" onclick="tg.close()">Chiudi Biglietto</button>
+        <button class="close-btn" onclick="tg.close()">Chiudi</button>
     </div>
+
+    <div id="toast">Email copiata!</div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- CONFIGURAZIONE ---
-        const MY_EMAIL = "tua.email@esempio.com"; // CAMBIA QUESTA
-        const SUBJECT = "Contatto da Bot Telegram";
+        // CONFIGURAZIONE
+        const MY_EMAIL = "tua.email@esempio.com"; 
 
-        // Prepariamo il link dell'email appena la pagina carica
-        const emailLink = document.getElementById('email-link');
-        emailLink.href = `mailto:${MY_EMAIL}?subject=${encodeURIComponent(SUBJECT)}`;
+        function handleEmail() {
+            // 1. Proviamo ad aprire l'app di posta direttamente
+            window.location.href = "mailto:" + MY_EMAIL;
+            
+            // 2. Copiamo l'indirizzo negli appunti come fallback automatico
+            const el = document.createElement('textarea');
+            el.value = MY_EMAIL;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            // 3. Mostriamo un feedback visivo (Toast)
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+            
+            // 4. Feedback aptico (vibrazione) se supportato
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
 
         // Dati Utente
         const user = tg.initDataUnsafe?.user;
