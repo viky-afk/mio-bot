@@ -122,6 +122,52 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        .map-wrapper {
+            background-color: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .map-wrapper:focus-within,
+        .map-wrapper.expanded {
+            box-shadow: 0 8px 24px rgba(0, 136, 204, 0.12);
+            border-color: #e2e8f0;
+        }
+
+        .map-wrapper .action-btn {
+            margin-bottom: 0;
+            border: none;
+            border-radius: 20px;
+            background-color: transparent;
+        }
+
+        .map-wrapper .action-btn:active {
+            background-color: #f1f5f9;
+        }
+
+        .map-container {
+            width: 100%;
+            max-height: 0;
+            background-color: #f8fafc;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .map-container.open {
+            max-height: 200px;
+        }
+
+        .map-container iframe {
+            width: calc(100% - 24px);
+            height: 180px;
+            margin: 0 12px 12px 12px;
+            border: none;
+            border-radius: 16px;
+            display: block;
+        }
     </style>
 </head>
 
@@ -137,22 +183,34 @@
 
         <div class="buttons-container">
             <!-- BOTTONE EMAIL -->
-            <div class="action-btn"
-                onclick="window.location.href = 'mailto:' + MY_EMAIL + '?subject=' + encodeURIComponent('Richiesta costruzione WebApp')">
+            <div class="action-btn" onclick="handleEmail()">
                 <div class="btn-label">
                     <span style="font-size: 24px;">📧</span>
                     <span>Email</span>
                 </div>
-                <span class="btn-status-text">Invia</span>
+                <!-- Ora usa lo stesso stile di Maps -->
+                <span class="btn-status-text">Copia</span>
             </div>
 
-            <!-- BOTTONE POSIZIONE -->
-            <div class="action-btn" onclick="tg.openLink('https://maps.app.goo.gl/esempio')">
-                <div class="btn-label">
-                    <span style="font-size: 24px;">📍</span>
-                    <span>Posizione</span>
+            <!-- GRUPPO ESPANDIBILE POSIZIONE -->
+            <div class="map-wrapper" id="map-wrapper">
+                <!-- BOTTONE POSIZIONE (APRE LA TENDINA) -->
+                <div class="action-btn" onclick="toggleMap()">
+                    <div class="btn-label">
+                        <span style="font-size: 24px;">📍</span>
+                        <span>Posizione</span>
+                    </div>
+                    <span class="btn-status-text" id="map-status">Mostra</span>
                 </div>
-                <span class="btn-status-text">Maps</span>
+
+                <!-- TENDINA MAPPA (NASCOSTA DI DEFAULT) -->
+                <div class="map-container" id="map-preview">
+                    <!-- Iframe di Google Maps centrato su Torino -->
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d89855.97800742133!2d7.601552885934571!3d45.0703814421453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47886d126418be25%3A0x6295ea9ce828fbd4!2sTurin%2C%20Metropolitan%20City%20of%20Turin!5e0!3m2!1sen!2sit!4v1709040000000!5m2!1sen!2sit"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
             </div>
         </div>
 
@@ -167,6 +225,49 @@
 
         // CONFIGURAZIONE
         const MY_EMAIL = "vincenzocoluccio05@gmail.com";
+
+        function handleEmail() {
+            // Copia negli appunti
+            const el = document.createElement('textarea');
+            el.value = MY_EMAIL;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            // Feedback visivo
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2000);
+
+            // Feedback vibrazione (Haptic)
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+
+        function toggleMap() {
+            const mapContainer = document.getElementById('map-preview');
+            const mapWrapper = document.getElementById('map-wrapper');
+            const mapStatus = document.getElementById('map-status');
+
+            if (mapContainer.classList.contains('open')) {
+                // Chiudi
+                mapContainer.classList.remove('open');
+                mapWrapper.classList.remove('expanded');
+                mapStatus.innerText = "Mostra";
+            } else {
+                // Apri
+                mapContainer.classList.add('open');
+                mapWrapper.classList.add('expanded');
+                mapStatus.innerText = "Nascondi";
+
+                // Feedback aptico leggero all'apertura
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.selectionChanged();
+                }
+            }
+        }
 
         // Dati Utente da Telegram
         const user = tg.initDataUnsafe?.user;
