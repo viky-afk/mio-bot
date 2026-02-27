@@ -211,7 +211,12 @@
 <body>
 
     <div class="main-card">
-        <div class="avatar-circle" id="user-initial">?</div>
+        <div class="avatar-circle" id="user-avatar-container" style="overflow: hidden; padding: 0;">
+            <!-- L'attributo onerror interviene se l'immagine non è disponibile/rotta -->
+            <img id="user-avatar" src="https://t.me/i/userpic/320/CleanViky.jpg" alt="Avatar"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                onerror="handleAvatarError(this)">
+        </div>
         <h1 id="user-name" style="font-size: 26px; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.02em;">
             Caricamento...</h1>
         <p id="user-id" style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px; font-weight: 500;"></p>
@@ -270,10 +275,30 @@
         tg.expand();
 
         // CONFIGURAZIONE
+        const MY_ID_STRING = "ID: 843623707 • @CleanViky";
         const MY_EMAIL = "vincenzocoluccio05@gmail.com";
 
-        // Imposta dinamicamente l'email nel box visivo all'avvio
+        // Estrai il Nome e Cognome reali da Telegram (se disponibili)
+        let displayName = "Ospite";
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            displayName = user.first_name + (user.last_name ? " " + user.last_name : "");
+        }
+
+        // Imposta dinamicamente i dati visivi all'avvio
         document.getElementById('display-email').innerText = MY_EMAIL;
+        document.getElementById('user-name').innerText = displayName;
+        document.getElementById('user-id').innerText = MY_ID_STRING;
+
+        // Funzione di fallback se la foto profilo non si carica
+        function handleAvatarError(imgElement) {
+            const container = document.getElementById('user-avatar-container');
+            // Rimuove lo stile di overflow per far tornare il centro del contenitore per il testo
+            container.style.overflow = '';
+            container.style.padding = '';
+            // Rimuove l'immagine rotta e inserisce l'iniziale del nome reale
+            container.innerHTML = displayName.charAt(0).toUpperCase();
+        }
 
         function handleEmailCopy() {
             // Copia negli appunti
@@ -358,17 +383,9 @@
             }
         }
 
-        // Dati Utente da Telegram
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('user-name').innerText = user.first_name + (user.last_name ? " " + user.last_name : "");
-            document.getElementById('user-id').innerText = "ID: " + user.id;
-            document.getElementById('user-initial').innerText = user.first_name.charAt(0).toUpperCase();
-        }
 
         tg.ready();
     </script>
 </body>
 
-</html>
 </html>
