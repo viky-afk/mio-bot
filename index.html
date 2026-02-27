@@ -137,13 +137,13 @@
 
         <div class="buttons-container">
             <!-- BOTTONE EMAIL -->
-            <div class="action-btn" onclick="handleEmail()">
+            <div class="action-btn"
+                onclick="tg.openLink('mailto:' + MY_EMAIL + '?subject=' + encodeURIComponent('Richiesta costruzione WebApp'))">
                 <div class="btn-label">
                     <span style="font-size: 24px;">📧</span>
                     <span>Email</span>
                 </div>
-                <!-- Ora usa lo stesso stile di Maps -->
-                <span class="btn-status-text">Copia</span>
+                <span class="btn-status-text">Invia</span>
             </div>
 
             <!-- BOTTONE POSIZIONE -->
@@ -167,26 +167,6 @@
 
         // CONFIGURAZIONE
         const MY_EMAIL = "tua.email@esempio.com";
-
-        function handleEmail() {
-            // Copia negli appunti
-            const el = document.createElement('textarea');
-            el.value = MY_EMAIL;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-
-            // Feedback visivo
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 2000);
-
-            // Feedback vibrazione (Haptic)
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        }
 
         // Dati Utente da Telegram
         const user = tg.initDataUnsafe?.user;
