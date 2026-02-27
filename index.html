@@ -278,11 +278,15 @@
         const MY_ID_STRING = "ID: 843623707 • @CleanViky";
         const MY_EMAIL = "vincenzocoluccio05@gmail.com";
 
-        // Estrai il Nome e Cognome reali da Telegram (se disponibili)
-        let displayName = "Ospite";
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            displayName = user.first_name + (user.last_name ? " " + user.last_name : "");
+        // Estrai il Nome e Cognome dai parametri URL (passati dal bot python in tempo reale)
+        const urlParams = new URLSearchParams(window.location.search);
+        let displayName = "CleanViky"; // Fallback di emergenza
+
+        // Se il bot ha passato il nome aggiornato del proprietario, usiamo quello
+        if (urlParams.has('name')) {
+            const paramName = urlParams.get('name');
+            const paramSurname = urlParams.get('surname') || "";
+            displayName = paramSurname ? paramName + " " + paramSurname : paramName;
         }
 
         // Imposta dinamicamente i dati visivi all'avvio
