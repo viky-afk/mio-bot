@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -123,12 +124,16 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="main-card">
         <div class="avatar-circle" id="user-initial">?</div>
-        <h1 id="user-name" style="font-size: 26px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.02em;">Caricamento...</h1>
-        <p style="color: var(--accent-blue); font-weight: 600; margin-bottom: 36px; font-size: 15px;">Contatti Professionali</p>
+        <h1 id="user-name" style="font-size: 26px; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.02em;">
+            Caricamento...</h1>
+        <p id="user-id" style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px; font-weight: 500;"></p>
+        <p style="color: var(--accent-blue); font-weight: 600; margin-bottom: 36px; font-size: 15px;">Contatti
+            Professionali</p>
 
         <div class="buttons-container">
             <!-- BOTTONE EMAIL -->
@@ -161,7 +166,7 @@
         tg.expand();
 
         // CONFIGURAZIONE
-        const MY_EMAIL = "tua.email@esempio.com"; 
+        const MY_EMAIL = "tua.email@esempio.com";
 
         function handleEmail() {
             // Copia negli appunti
@@ -176,7 +181,7 @@
             const toast = document.getElementById('toast');
             toast.classList.add('show');
             setTimeout(() => { toast.classList.remove('show'); }, 2000);
-            
+
             // Feedback vibrazione (Haptic)
             if (tg.HapticFeedback) {
                 tg.HapticFeedback.notificationOccurred('success');
@@ -187,10 +192,12 @@
         const user = tg.initDataUnsafe?.user;
         if (user) {
             document.getElementById('user-name').innerText = user.first_name + (user.last_name ? " " + user.last_name : "");
+            document.getElementById('user-id').innerText = "ID: " + user.id;
             document.getElementById('user-initial').innerText = user.first_name.charAt(0).toUpperCase();
         }
 
         tg.ready();
     </script>
 </body>
+
 </html>
