@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="it">
 
 <head>
@@ -260,14 +260,13 @@
             display: none;
         }
 
-        /* --- STILI HOTSPOT 3D --- */
+        /* --- STILI HOTSPOT 3D (VISIVI MA NON INTERATTIVI DIRETTAMENTE) --- */
         .Hotspot {
             background: var(--card-white);
             border-radius: 50%;
             border: 2px solid var(--accent-blue);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             box-sizing: border-box;
-            cursor: pointer;
             height: 28px;
             width: 28px;
             padding: 0;
@@ -276,10 +275,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            pointer-events: auto;
-            /* Risolve problemi di touch */
-            touch-action: none;
-            /* Impedisce scroll mentre clicchi */
+            pointer-events: none;
+            /* Lasciamo passare i click al model-viewer */
+            z-index: 10;
         }
 
         .Hotspot:not([data-visible]) {
@@ -288,12 +286,6 @@
             box-shadow: none;
             height: 24px;
             width: 24px;
-            pointer-events: none;
-        }
-
-        .Hotspot:focus {
-            border: 2px solid #10b981;
-            outline: none;
         }
 
         .Hotspot>* {
@@ -316,6 +308,20 @@
             position: absolute;
             top: 50%;
             width: max-content;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 136, 204, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 136, 204, 0);
+            }
         }
 
         .wizard-step.active {
@@ -773,7 +779,9 @@
                 
                 <!-- VISUALIZZATORE 3D INTERATTIVO -->
                 <div style="margin-top: 16px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc; height: 300px; position: relative;">
+                    
                     <model-viewer 
+                        id="main-viewer"
                         src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
                         alt="Esploso 3D di ${currentSelection.part}" 
                         auto-rotate 
@@ -781,33 +789,36 @@
                         style="width: 100%; height: 100%;"
                         shadow-intensity="1">
                         
-                        <!-- HOTSPOT (Pallino Interattivo) -->
-                        <button class="Hotspot" id="btn-hotspot-1" slot="hotspot-1" data-position="0 1.5 0.5" data-normal="0 0 1" onclick="showPartDetails('Visiera Casco', 'VAILL-100234', '45,00')">
-                            <div class="HotspotAnnotation">Clicca il Ricambio</div>
+                        <!-- HOTSPOT (Pallino Visivo, non riceve click diretti) -->
+                        <button class="Hotspot" slot="hotspot-visiera" data-position="0 1.5 0.5" data-normal="0 0 1">
+                            <div class="HotspotAnnotation">Clicca qui</div>
                         </button>
-
                     </model-viewer>
+
                 </div>
                 <!-- Fine Visualizzatore 3D -->
             `;
             goToStep(4);
 
-            // Colleghiamo l'evento click in modo più robusto per iOS/Android e Telegram
-            setTimeout(() => {
-                const hotspotBtn = document.getElementById('btn-hotspot-1');
-                if (hotspotBtn) {
-                    // Ascolto per mouse
-                    hotspotBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        showPartDetails('Visiera Casco', 'VAILL-100234', '45,00');
-                    });
-                    // Ascolto per touch su mobile (Telegram WebApp)
-                    hotspotBtn.addEventListener('touchstart', (e) => {
-                        e.stopPropagation();
-                        showPartDetails('Visiera Casco', 'VAILL-100234', '45,00');
-                    });
-                }
-            }, 500);
+            // AGGIRAMENTO TELEGRAM: RAYCASTING MANUALE
+            // Invece di far cliccare il bottone (che viene mangiato da iOS/Android in iframe),
+            // calcoliamo DOVE l'utente tocca lo schermo 3D
+            const viewer = document.getElementById('main-viewer');
+
+            if (viewer) {
+                viewer.addEventListener('click', (event) => {
+                    // Ottieni il punto in 3D in cui si è toccato lo schermo
+                    const hit = viewer.positionAndNormalFromPoint(event.clientX, event.clientY);
+
+                    if (hit) {
+                        // Se l'utente ha toccato una zona vicina (approssimazione visiera astronauta)
+                        // L'astronauta ha altezza Y=1.5 circa e Y fronte=0.5 circa
+                        if (hit.position.y > 1.2 && hit.position.z > 0.2) {
+                            showPartDetails('Visiera Casco', 'VAILL-100234', '45,00');
+                        }
+                    }
+                });
+            }
         }
 
         function showPartDetails(partName, code, price) {
